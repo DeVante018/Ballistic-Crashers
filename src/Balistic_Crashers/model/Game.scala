@@ -11,6 +11,7 @@ import scalafx.scene.shape.{Rectangle, Shape}
 import scala.collection.mutable
 
 class Game {
+  var change:Int = 0
   var enemyUpdate: Double = 0.0
   var playerAttackLasersMap: mutable.Map[Shape, Attacks] = mutable.Map()
   var enemiesAttackLazersMap: mutable.Map[Shape, Enemies] = mutable.Map()
