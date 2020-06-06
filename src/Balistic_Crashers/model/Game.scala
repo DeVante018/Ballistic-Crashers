@@ -13,7 +13,7 @@ import scala.collection.mutable
 class Game {
   var enemyUpdate: Double = 0.0
   var playerAttackLasersMap: mutable.Map[Shape, Attacks] = mutable.Map()
-  var enemiesAttackLazersMap: mutable.Map[Shape, Double] = mutable.Map()
+  var enemiesAttackLazersMap: mutable.Map[Shape, Enemies] = mutable.Map()
 
   var enemiesMap: mutable.Map[Shape, Enemies] = mutable.Map()
   var world: levelTrait = generateLevel("Nexus")
@@ -28,10 +28,11 @@ class Game {
   val sceneGraphics: Group = new Group {}
 
   def update(deltaTime: Double): Unit = {
+    //increase the total update time for the player
     player_1.lazerUpdateTimeThreashold += deltaTime
-    val lazerCheck: Boolean = player_1.update(deltaTime)
+    val lazerCheck: Boolean = player_1.update(deltaTime)//checks if player is holding down the space button (shoot laser button)
     if (lazerCheck){
-      if (player_1.lazerUpdateTimeThreashold > 0.2) {
+      if (player_1.lazerUpdateTimeThreashold > 0.2) { //if the set amount of time has passed then allow laser to fire
         createNewPlayerLazer()
         player_1.lazerUpdateTimeThreashold = 0.0
       }
@@ -73,7 +74,7 @@ class Game {
       translateY = enemy.loc.locy
       fill = Color.Green
     }
-    enemiesAttackLazersMap += (newLazerShape -> enemy.atk)
+    enemiesAttackLazersMap += (newLazerShape -> enemy)
     sceneGraphics.children.add(newLazerShape)
   }
 
@@ -90,14 +91,14 @@ class Game {
     }
   }
 
-  def updateEnemyLaserPosition(enmLzrMap: mutable.Map[Shape, Double]): Unit = {
+  def updateEnemyLaserPosition(enmLzrMap: mutable.Map[Shape, Enemies]): Unit = {
     for (theLazer <- enmLzrMap) {
-      if (theLazer._1.translateX.toDouble - (100 * .1) < -10) {
+      if (theLazer._1.translateX.toDouble - (theLazer._2.laserSpeed * .1) < -10) {
         enemiesAttackLazersMap -= theLazer._1
         sceneGraphics.children.remove(theLazer._1)
       }
       else {
-        theLazer._1.translateX = theLazer._1.translateX.value - (100 * .1)
+        theLazer._1.translateX = theLazer._1.translateX.value - (theLazer._2.laserSpeed * .1)
       }
       //println(playerAttackLasersMap.size)
     }
@@ -129,7 +130,7 @@ class Game {
       if ((deltaDistanceX <= 135 && deltaDistanceX >= 0) && (deltaDistanceY <= 45 && deltaDistanceY >= 3)) {
         enemiesAttackLazersMap -= laser._1
         sceneGraphics.children.remove(laser._1)
-        player_1.health -= laser._2
+        player_1.health -= laser._2.atk
         if (player_1.health <= 0) {
           println("player is dead")
         }
