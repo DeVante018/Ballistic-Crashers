@@ -18,14 +18,8 @@ class Player(locX: Double, locY: Double, shipName: String) {
   var health: Double = 100
   //speed scale factor
   val scaleFactor: Double = 0.1
-  //player shape
-  val playerObject: Shape = new Rectangle() { // change this for te ship image
-    width = 20
-    height = 20
-    translateX = playerLocation.locx
-    translateY = playerLocation.locy
-    fill = Color.Gold
-  }
+  //time for player to update
+  var lazerUpdateTimeThreashold:Double = 0.0
   // set different states for the player
   var stateOfPlayer: PlayerState = new Still(this)
   var count: Int = 0
@@ -40,12 +34,10 @@ class Player(locX: Double, locY: Double, shipName: String) {
   // Start API press methods
   def leftPressed(): Unit = {
     this.goLeftHeld = true
-    //this.stateOfPlayer.leftKeyPressed()
   }
 
   def rightPressed(): Unit = {
     this.goRightHeld = true
-    //this.stateOfPlayer.rightKeyPressed()
   }
 
   def upPressed(): Unit = {
@@ -91,12 +83,10 @@ class Player(locX: Double, locY: Double, shipName: String) {
     count += 1
     if (playerLocation.locx + (ship.spd * scaleFactor) >= 1185) {
       playerLocation.locx = 1185
-      //for test cube movement// playerObject.translateX.value = 1341
       ship.getShip().setX(playerLocation.locx)
     }
     else {
       playerLocation.locx += (ship.spd * scaleFactor)
-      //playerObject.translateX.value = playerLocation.locx
       ship.getShip().setX(playerLocation.locx)
     }
   }
@@ -105,12 +95,10 @@ class Player(locX: Double, locY: Double, shipName: String) {
     // set boundaries
     if (playerLocation.locx - (ship.spd * scaleFactor) <= 0) {
       playerLocation.locx = 0
-      //playerObject.translateX = 0
       ship.getShip().setX(playerLocation.locx)
     }
     else {
       playerLocation.locx -= (ship.spd * scaleFactor)
-      //playerObject.translateX = playerLocation.locx
       ship.getShip().setX(playerLocation.locx)
     }
   }
@@ -119,12 +107,10 @@ class Player(locX: Double, locY: Double, shipName: String) {
     // set boundaries
     if (playerLocation.locy - (ship.spd * scaleFactor) <= -25) {
       playerLocation.locy = -25
-      //playerObject.translateY.value = 0
       ship.getShip().setY(playerLocation.locy)
     }
     else {
       playerLocation.locy += (-ship.spd * scaleFactor)
-      //playerObject.translateY.value = playerLocation.locy
       ship.getShip().setY(playerLocation.locy)
     }
   }
@@ -133,12 +119,10 @@ class Player(locX: Double, locY: Double, shipName: String) {
     //set boundaries
     if (playerLocation.locy + (ship.spd * scaleFactor) >= 705) {
       playerLocation.locy = 705
-      //playerObject.translateY = 750
       ship.getShip().setY(playerLocation.locy)
     }
     else {
       playerLocation.locy += (ship.spd * scaleFactor)
-      //playerObject.translateY = playerLocation.locy
       ship.getShip().setY(playerLocation.locy)
     }
   }
