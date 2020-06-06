@@ -8,4 +8,6 @@ trait Enemies {
   var health: Double
   var atk: Double
   var dt: Double
+  var updateLazerThreashold:Double = 0.0
+  var alpha:Double
 }

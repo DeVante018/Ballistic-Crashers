@@ -11,7 +11,6 @@ import scalafx.scene.shape.{Rectangle, Shape}
 import scala.collection.mutable
 
 class Game {
-  var enemyLazerUpdateThreashold: Double = 0.0
   var enemyUpdate: Double = 0.0
   var playerAttackLasersMap: mutable.Map[Shape, Attacks] = mutable.Map()
   var enemiesAttackLazersMap: mutable.Map[Shape, Double] = mutable.Map()
@@ -30,20 +29,22 @@ class Game {
 
   def update(deltaTime: Double): Unit = {
     player_1.lazerUpdateTimeThreashold += deltaTime
-    enemyLazerUpdateThreashold += deltaTime
     val lazerCheck: Boolean = player_1.update(deltaTime)
-    if (lazerCheck) {
+    if (lazerCheck){
       if (player_1.lazerUpdateTimeThreashold > 0.2) {
         createNewPlayerLazer()
         player_1.lazerUpdateTimeThreashold = 0.0
       }
     }
     //enemies attack timer
-    if (enemyLazerUpdateThreashold > 0.4) {
-      for (enemies <- enemiesMap) {
+    for(enemies <- enemiesMap){
+      enemies._2.updateLazerThreashold += deltaTime
+    }
+    for(enemies <- enemiesMap){
+      if(enemies._2.updateLazerThreashold > enemies._2.alpha){
         createNewEnemyLazer(enemies._2)
+        enemies._2.updateLazerThreashold = 0
       }
-      enemyLazerUpdateThreashold = 0
     }
     updateEnemyLaserPosition(enemiesAttackLazersMap)
     updatePlayerLaserPosition(playerAttackLasersMap)
