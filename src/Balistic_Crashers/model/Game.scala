@@ -1,7 +1,9 @@
 package Balistic_Crashers.model
 
-import Balistic_Crashers.Enemies.{Enemies, Sputter}
+import Balistic_Crashers.ArtificialIntelligence.UpDown
 import Balistic_Crashers.Player
+import Balistic_Crashers.enemies.{Enemies, Sputter}
+import Balistic_Crashers.gameplay.Script
 import Balistic_Crashers.model.World.Nexus
 import Balistic_Crashers.model.World.`trait`.levelTrait
 import scalafx.scene.Group
@@ -9,16 +11,17 @@ import scalafx.scene.paint.Color
 import scalafx.scene.shape.{Rectangle, Shape}
 
 import scala.collection.mutable
-
+import scala.collection.mutable.ArrayBuffer
 class Game {
-  var change:Int = 0
-  var enemyUpdate: Double = 0.0
-  var playerAttackLasersMap: mutable.Map[Shape, Attacks] = mutable.Map()
-  var enemiesAttackLazersMap: mutable.Map[Shape, Enemies] = mutable.Map()
 
+  var playerAttackLasersMap: mutable.Map[Shape, Attacks] = mutable.Map() // maps all lasers shot by the player
+  var enemiesAttackLazersMap: mutable.Map[Shape, Enemies] = mutable.Map() // maps all lasers shot by the enemies
+  var script:ArrayBuffer[Script] = new ArrayBuffer[Script]()
   var enemiesMap: mutable.Map[Shape, Enemies] = mutable.Map()
   var world: levelTrait = generateLevel("Nexus")
   val player_1: Player = new Player(200.0, 300.0, "Lapix")
+
+  createScript()
 
   def generateLevel(world: String): levelTrait = world.toLowerCase match {
     case "nexus" => new Nexus
@@ -40,12 +43,12 @@ class Game {
     }
     //enemies attack timer
     for(enemies <- enemiesMap){
-      enemies._2.updateLazerThreashold += deltaTime
+      enemies._2.updateLaserThreshold += deltaTime
     }
     for(enemies <- enemiesMap){
-      if(enemies._2.updateLazerThreashold > enemies._2.alpha){
+      if(enemies._2.updateLaserThreshold > enemies._2.alpha){
         createNewEnemyLazer(enemies._2)
-        enemies._2.updateLazerThreashold = 0
+        enemies._2.updateLaserThreshold = 0
       }
     }
     updateEnemyLaserPosition(enemiesAttackLazersMap)
@@ -139,19 +142,59 @@ class Game {
     }
   }
 
-  def generateEnemy(dt: Double): Unit = {
-    enemyUpdate += dt
-    if (enemyUpdate >= 5 && enemiesMap.isEmpty) {
-      val create = new Rectangle {
-        width = 60
-        height = 40
-        translateX = 500
-        translateY = 500
-        fill = Color.Purple
+  def generateEnemy(x:Double,y:Double,enemyType:String): Unit = {
+    val create = new Rectangle {
+      width = 60
+      height = 40
+      translateX = 0.0
+      translateY = 0.0
+      fill = Color.Purple
+    }
+    create.translateX = x
+    create.translateY = y
+    if(enemyType.toLowerCase() == "sputter"){
+      enemiesMap += (create -> new Sputter(x,y))
+    }
+    sceneGraphics.children.add(create)
+  }
+  def createScript():Unit = {
+    var scr:Script = new Script(6,new UpDown("sputter",20)) // AI object
+
+    script += scr
+  }
+  private var scriptPos:Int = 0
+  private var nextEvent:Boolean = true
+  private var scriptTimer:Double = 0.0
+
+  def runScript(dt:Double):Unit = {
+    val randomSpawn = util.Random
+    var enemyPos:Int = 0
+    var currentEvent:Script = new Script(0, new UpDown("sputter",20))
+    if(nextEvent && scriptPos < script.size){
+      currentEvent = script(scriptPos)
+      for(_ <- 1 to currentEvent.enmCnt){
+        enemyPos = randomSpawn.nextInt(1200)
+        if(enemyPos < 400)enemyPos = 400
+        generateEnemy(enemyPos,randomSpawn.nextInt(600),currentEvent.behavior.enemyName)
       }
-      sceneGraphics.children.add(create)
-      enemiesMap += (create -> new Sputter(500, 500))
-      enemyUpdate = 0
+      nextEvent = false
+    }
+    if(scriptTimer < currentEvent.behavior.time){
+      scriptTimer += dt
+      if(scriptTimer >= currentEvent.behavior.time){
+        scriptTimer = currentEvent.behavior.time
+      }
+    }
+    if(enemiesMap.isEmpty){
+      if(scriptTimer != currentEvent.behavior.time){
+        scriptTimer = currentEvent.behavior.time - 1
+      }
+    }
+    if(scriptTimer == currentEvent.behavior.time){
+      if(enemiesMap.isEmpty){
+        nextEvent = true
+        scriptPos += 1
+      }
     }
   }
 }

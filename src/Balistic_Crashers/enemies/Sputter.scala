@@ -1,4 +1,4 @@
-package Balistic_Crashers.Enemies
+package Balistic_Crashers.enemies
 
 import Balistic_Crashers.model.Coordinates.Location
 

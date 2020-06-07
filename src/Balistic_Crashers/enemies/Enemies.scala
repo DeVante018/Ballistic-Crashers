@@ -1,4 +1,4 @@
-package Balistic_Crashers.Enemies
+package Balistic_Crashers.enemies
 
 import Balistic_Crashers.model.Coordinates.Location
 /** Each enemy will have these traits and the update timer for all enemies will be tracked within the enemy itself
@@ -9,6 +9,6 @@ trait Enemies {
   var health: Double
   var atk: Double
   var laserSpeed:Double
-  var updateLazerThreashold:Double = 0.0
+  var updateLaserThreshold:Double = 0.0
   var alpha:Double
 }

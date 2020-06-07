@@ -10,8 +10,7 @@ import scalafx.application.JFXApp
 import scalafx.application.JFXApp.PrimaryStage
 import scalafx.scene.effect.DropShadow
 import scalafx.scene.paint.Color._
-import scalafx.scene.paint.{Color, LinearGradient, Stops}
-import scalafx.scene.shape.{Rectangle, Shape}
+import scalafx.scene.paint.{LinearGradient, Stops}
 import scalafx.scene.text.Text
 import scalafx.scene.{Group, Scene}
 
@@ -67,26 +66,17 @@ object GUI extends JFXApp {
     }
   }
 
-  def playerSprite(xLocation: Double, yLocation: Double, color: Color): Shape = {
-    new Rectangle {
-      width = 89
-      height = 78
-      translateX = 10
-      translateY = 10
-      fill = color
-    }
-  }
-
   // start of the game menu
   def startGame(): Unit = {
 
     var lastUpdateTime: Long = System.nanoTime()
     val game: Game = new Game()
-
+    //val script: collection.mutable.ListBuffer[]
     game.sceneGraphics.children.add(game.player_1.ship.getShip())
-    stage = new PrimaryStage() {
+
+    stage = new PrimaryStage(){
       title = "Nexus"
-      scene = new Scene(1341, 750) {
+      scene = new Scene(1341, 750){
         fill = DarkGray
         content = List(game.sceneGraphics)
         addEventHandler(KeyEvent.ANY, new WASDInputs(game.player_1))
@@ -95,7 +85,7 @@ object GUI extends JFXApp {
         val dt: Double = (time - lastUpdateTime) / 1000000000.0
         lastUpdateTime = time
         game.update(dt)
-        game.generateEnemy(dt)
+        game.runScript(dt)
       }
       AnimationTimer(update).start()
     }
