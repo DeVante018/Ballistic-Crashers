@@ -1,9 +1,11 @@
 package Balistic_Crashers.view
 
+import java.io.FileInputStream
+
 import Balistic_Crashers.controller.WASDInputs
 import Balistic_Crashers.model.Game
-import javafx.event.ActionEvent
-import javafx.scene.control.Button
+import javafx.scene.image.{Image, ImageView}
+import javafx.scene.input
 import javafx.scene.input.KeyEvent
 import scalafx.animation.AnimationTimer
 import scalafx.application.JFXApp
@@ -45,18 +47,17 @@ object GUI extends JFXApp {
     }
   }
 
-  val startButton: javafx.scene.control.Button = new Button("Start") {
-    color(0.5, 0.8, 0.4)
-    setStyle("-fx-font-size: 29pt")
-    setLayoutX(435)
-    setLayoutY(250)
-    setOnAction((event: ActionEvent) => {
-      startGame()
-    })
-  }
+  val inputStream: FileInputStream = new FileInputStream("/Users/DeVante/Desktop/SummerGameProject/src/Balistic_Crashers/assets/UI/Start_Button_Trans.png")
+  val image: Image = new Image(inputStream)
+  val startButtonOverlay: ImageView = new ImageView(image)
+  startButtonOverlay.setX(427)
+  startButtonOverlay.setY(240)
+  startButtonOverlay.setPreserveRatio(true)
+  startButtonOverlay.setOnMouseClicked((event: input.MouseEvent) => startGame())
+
   sceneGraphics.children.add(titleBalistic)
   sceneGraphics.children.add(titleCrashers)
-  sceneGraphics.children.add(startButton)
+  sceneGraphics.children.add(startButtonOverlay)
 
   stage = new PrimaryStage() {
     title = "Balistic Crashers"

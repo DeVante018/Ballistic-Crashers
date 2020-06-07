@@ -158,7 +158,7 @@ class Game {
     sceneGraphics.children.add(create)
   }
   def createScript():Unit = {
-    var scr:Script = new Script(6,new UpDown("sputter",20)) // AI object
+    var scr:Script = new Script(12,new UpDown("sputter",20)) // AI object
 
     script += scr
   }
