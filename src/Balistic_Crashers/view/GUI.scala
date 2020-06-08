@@ -72,7 +72,6 @@ object GUI extends JFXApp {
 
     var lastUpdateTime: Long = System.nanoTime()
     val game: Game = new Game()
-    //val script: collection.mutable.ListBuffer[]
     game.sceneGraphics.children.add(game.player_1.ship.getShip())
 
     stage = new PrimaryStage(){

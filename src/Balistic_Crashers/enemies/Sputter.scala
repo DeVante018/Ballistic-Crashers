@@ -2,7 +2,7 @@ package Balistic_Crashers.enemies
 
 import Balistic_Crashers.model.Coordinates.Location
 
-class Sputter(x: Double, y: Double) extends Enemies {
+class Sputter(x: Double, y: Double,movement:String) extends Enemies {
   override var speed: Double = 15.00
   override var health: Double = 100.00
   override val loc: Location = new Location(x, y)

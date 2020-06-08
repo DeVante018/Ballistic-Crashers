@@ -1,6 +1,6 @@
 package Balistic_Crashers.model
 
-import Balistic_Crashers.ArtificialIntelligence.UpDown
+import Balistic_Crashers.ArtificialIntelligence.{AI, UpDown}
 import Balistic_Crashers.Player
 import Balistic_Crashers.enemies.{Enemies, Sputter}
 import Balistic_Crashers.gameplay.Script
@@ -142,7 +142,7 @@ class Game {
     }
   }
 
-  def generateEnemy(x:Double,y:Double,enemyType:String): Unit = {
+  def generateEnemy(x:Double,y:Double,enemyType:String,intelType:AI): Unit = {
     val create = new Rectangle {
       width = 60
       height = 40
@@ -153,14 +153,17 @@ class Game {
     create.translateX = x
     create.translateY = y
     if(enemyType.toLowerCase() == "sputter"){
-      enemiesMap += (create -> new Sputter(x,y))
+      enemiesMap += (create -> new Sputter(x,y,intelType.typeName))
     }
     sceneGraphics.children.add(create)
   }
-  def createScript():Unit = {
-    var scr:Script = new Script(12,new UpDown("sputter",20)) // AI object
 
-    script += scr
+  //this method is how to create a script for the game. If interested check out the read-me file to learn how to make it yourself
+  def createScript():Unit = {
+    script += new Script(1,new UpDown("sputter",3.0))
+    script += new Script(2,new UpDown("sputter",4.0))
+    script += new Script(3,new UpDown("sputter",6.0))
+    script += new Script(7,new UpDown("sputter",2.0))
   }
   private var scriptPos:Int = 0
   private var nextEvent:Boolean = true
@@ -169,32 +172,34 @@ class Game {
   def runScript(dt:Double):Unit = {
     val randomSpawn = util.Random
     var enemyPos:Int = 0
-    var currentEvent:Script = new Script(0, new UpDown("sputter",20))
-    if(nextEvent && scriptPos < script.size){
-      currentEvent = script(scriptPos)
+    val currentEvent:Script = script(scriptPos)
+    if(nextEvent){
       for(_ <- 1 to currentEvent.enmCnt){
         enemyPos = randomSpawn.nextInt(1200)
         if(enemyPos < 400)enemyPos = 400
-        generateEnemy(enemyPos,randomSpawn.nextInt(600),currentEvent.behavior.enemyName)
+        generateEnemy(enemyPos,randomSpawn.nextInt(600),currentEvent.behavior.enemyName,currentEvent.behavior)
       }
       nextEvent = false
     }
-    if(scriptTimer < currentEvent.behavior.time){
-      scriptTimer += dt
-      if(scriptTimer >= currentEvent.behavior.time){
-        scriptTimer = currentEvent.behavior.time
-      }
+    if(enemiesMap.isEmpty && scriptPos < script.size - 1){
+      nextEvent = true
+      scriptPos += 1
     }
-    if(enemiesMap.isEmpty){
-      if(scriptTimer != currentEvent.behavior.time){
-        scriptTimer = currentEvent.behavior.time - 1
-      }
+    if(enemiesMap.nonEmpty){
+      enemyMovement(dt,currentEvent)
     }
-    if(scriptTimer == currentEvent.behavior.time){
-      if(enemiesMap.isEmpty){
-        nextEvent = true
-        scriptPos += 1
+  }
+
+  def enemyMovement(dt:Double,curEvent:Script): Unit = {
+    scriptTimer += dt
+    for(enemy <- enemiesMap){
+      if(scriptTimer < curEvent.behavior.time/2.0){
+        curEvent.behavior.moveEnemyAxisUp(enemy)
       }
+      else if(scriptTimer >= curEvent.behavior.time/2.0 && scriptTimer <= curEvent.behavior.time){
+        curEvent.behavior.moveEnemyAxisDown(enemy)
+      }
+      else scriptTimer = 0
     }
   }
 }
