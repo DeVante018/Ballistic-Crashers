@@ -6,7 +6,7 @@ import Balistic_Crashers.model.Ships.Trait.Ship
 import javafx.scene.image.{Image, ImageView}
 
 class Lapix(x: Double, y: Double) extends Ship {
-  val inputStream: FileInputStream = new FileInputStream("/Users/DeVante/Desktop/SummerGameProject/src/Balistic_Crashers/Assets/Ships/Ship #1_TESTa1.png")
+  val inputStream: FileInputStream = new FileInputStream("/Users/DeVante/Desktop/SummerGameProject/src/Balistic_Crashers/assets/Ships/lapix_A.png")
   val image: Image = new Image(inputStream)
   val lapixShipImage: ImageView = new ImageView(image)
 

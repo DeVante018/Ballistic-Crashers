@@ -77,7 +77,7 @@ object GUI extends JFXApp {
     stage = new PrimaryStage(){
       title = "Nexus"
       scene = new Scene(1341, 750){
-        fill = DarkGray
+        fill = Black
         content = List(game.sceneGraphics)
         addEventHandler(KeyEvent.ANY, new WASDInputs(game.player_1))
       }

@@ -64,7 +64,7 @@ class Game {
       width = 12
       height = 3
       translateX = player_1.playerLocation.locx + 170
-      translateY = player_1.playerLocation.locy + 53
+      translateY = player_1.playerLocation.locy + 83
       fill = Color.Red
     }
     val newLazerAttributes = new Attacks(player_1)
@@ -174,6 +174,7 @@ class Game {
     script += new Script(1,new UpDown("sputter",1.0))
     script += new Script(7,new UpDown("sputter",4.0))
     script += new Script(17,new UpDown("sputter",2.3))
+
   }
   private var scriptPos:Int = 0
   private var nextEvent:Boolean = true
