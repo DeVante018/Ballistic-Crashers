@@ -36,7 +36,7 @@ class Game {
     player_1.lazerUpdateTimeThreashold += deltaTime
     val lazerCheck: Boolean = player_1.update(deltaTime)//checks if player is holding down the space button (shoot laser button)
     if (lazerCheck){
-      if (player_1.lazerUpdateTimeThreashold > 0.2) { //if the set amount of time has passed then allow laser to fire
+      if (player_1.lazerUpdateTimeThreashold > 0.3) { //if the set amount of time has passed then allow laser to fire
         createNewPlayerLazer()
         player_1.lazerUpdateTimeThreashold = 0.0
       }
@@ -46,9 +46,11 @@ class Game {
       enemies._2.updateLaserThreshold += deltaTime
     }
     for(enemies <- enemiesMap){
-      if(enemies._2.updateLaserThreshold > enemies._2.alpha){
-        createNewEnemyLazer(enemies._2)
-        enemies._2.updateLaserThreshold = 0
+      if(enemies._2.animationDone) {
+        if (enemies._2.updateLaserThreshold > enemies._2.LaserUpdateAlpha) {
+          createNewEnemyLazer(enemies._2)
+          enemies._2.updateLaserThreshold = 0
+        }
       }
     }
     updateEnemyLaserPosition(enemiesAttackLazersMap)
@@ -84,12 +86,12 @@ class Game {
 
   def updatePlayerLaserPosition(shapeToAttacks: mutable.Map[Shape, Attacks]): Unit = {
     for (theLazer <- shapeToAttacks) {
-      if (theLazer._1.translateX.toDouble + (120 * .1) > 1400) {
+      if (theLazer._1.translateX.toDouble + (140 * .1) > 1500) {
         playerAttackLasersMap -= theLazer._1
         sceneGraphics.children.remove(theLazer._1)
       }
       else {
-        theLazer._1.translateX = theLazer._1.translateX.toDouble + (120 * .1)
+        theLazer._1.translateX = theLazer._1.translateX.toDouble + (140 * .1)
       }
       println(playerAttackLasersMap.size)
     }
@@ -121,6 +123,8 @@ class Game {
           if (enemyShip._2.health <= 0) {
             sceneGraphics.children.remove(enemyShip._1)
             enemiesMap -= enemyShip._1
+            enemyShip._2.animationDone = true
+            enemyShipZoomIn = 10.00
           }
         }
       }
@@ -142,7 +146,7 @@ class Game {
     }
   }
 
-  def generateEnemy(x:Double,y:Double,enemyType:String,intelType:AI): Unit = {
+  def generateEnemy(x:Double,y:Double,enemyType:String,intelType:AI): Enemies = {
     val create = new Rectangle {
       width = 60
       height = 40
@@ -152,24 +156,27 @@ class Game {
     }
     create.translateX = x
     create.translateY = y
+    val newEnemy = new Sputter(x,y,intelType.typeName)
     if(enemyType.toLowerCase() == "sputter"){
-      enemiesMap += (create -> new Sputter(x,y,intelType.typeName))
+      enemiesMap += (create -> newEnemy)
     }
     sceneGraphics.children.add(create)
+    newEnemy
   }
 
   //this method is how to create a script for the game. If interested check out the read-me file to learn how to make it yourself
   def createScript():Unit = {
-    script += new Script(1,new UpDown("sputter",3.0))
-    script += new Script(2,new UpDown("sputter",4.0))
-    script += new Script(3,new UpDown("sputter",6.0))
-    script += new Script(7,new UpDown("sputter",2.0))
+    script += new Script(3,new UpDown("sputter",3.0))
+    script += new Script(3,new UpDown("sputter",2.0))
+    script += new Script(3,new UpDown("sputter",3.3))
   }
   private var scriptPos:Int = 0
   private var nextEvent:Boolean = true
-  private var scriptTimer:Double = 0.0
+  private var spawnDelay:Double = 0.0
+  private var enemyShipZoomIn:Double = 10.0
 
   def runScript(dt:Double):Unit = {
+    spawnDelay += dt
     val randomSpawn = util.Random
     var enemyPos:Int = 0
     val currentEvent:Script = script(scriptPos)
@@ -177,7 +184,8 @@ class Game {
       for(_ <- 1 to currentEvent.enmCnt){
         enemyPos = randomSpawn.nextInt(1200)
         if(enemyPos < 400)enemyPos = 400
-        generateEnemy(enemyPos,randomSpawn.nextInt(600),currentEvent.behavior.enemyName,currentEvent.behavior)
+        val en = generateEnemy(1400,randomSpawn.nextInt(600),currentEvent.behavior.enemyName,currentEvent.behavior)
+        en.stopAnimationXpos = enemyPos
       }
       nextEvent = false
     }
@@ -191,15 +199,35 @@ class Game {
   }
 
   def enemyMovement(dt:Double,curEvent:Script): Unit = {
-    scriptTimer += dt
+    var bool:Boolean = true
     for(enemy <- enemiesMap){
-      if(scriptTimer < curEvent.behavior.time/2.0){
-        curEvent.behavior.moveEnemyAxisUp(enemy)
+      if(enemy._2.animationDone){
+        enemy._2.timer += dt
+        curEvent.behavior.doEnemyMovement(enemy, enemy._2.timer)
       }
-      else if(scriptTimer >= curEvent.behavior.time/2.0 && scriptTimer <= curEvent.behavior.time){
-        curEvent.behavior.moveEnemyAxisDown(enemy)
+      else{
+        if(bool){
+          shipEntryAnimation(enemy)
+          bool = false
+        }
       }
-      else scriptTimer = 0
     }
   }
+
+  def shipEntryAnimation(tuple: (Shape, Enemies)): Unit = {
+    if(tuple._2.loc.locx - enemyShipZoomIn <= tuple._2.stopAnimationXpos){
+      tuple._2.loc.locx = tuple._2.stopAnimationXpos
+      tuple._1.translateX.value = tuple._2.stopAnimationXpos
+    }
+    else {
+      tuple._2.loc.locx -= enemyShipZoomIn
+      tuple._1.translateX.value -= enemyShipZoomIn
+      enemyShipZoomIn -= 0.04
+    }
+    if(tuple._2.loc.locx == tuple._2.stopAnimationXpos){
+      tuple._2.animationDone = true
+      enemyShipZoomIn = 10.0
+    }
+  }
+
 }
