@@ -19,7 +19,7 @@ import scalafx.scene.{Group, Scene}
 
 object GUI extends JFXApp {
 
-  var sceneGraphics: Group = new Group {}
+  val sceneGraphics: Group = new Group {}
 
   val titleBalistic: Text = new Text(275.00, 200.00, "Balistic") {
     style = "-fx-font-size: 48pt"
@@ -61,7 +61,7 @@ object GUI extends JFXApp {
 
   stage = new PrimaryStage() {
     title = "Balistic Crashers"
-    scene = new Scene(1080, 1000) {
+    scene = new Scene(1341, 750) {
       fill = Black
       content = List(sceneGraphics)
     }

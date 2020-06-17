@@ -17,7 +17,7 @@ object ScalaFXHelloWorld extends JFXApp {
   imageView.setX(200)
   imageView.setY(0)
   imageView.setPreserveRatio(true)
-  var sceneGraphics: Group = new Group {}
+  val sceneGraphics: Group = new Group {}
   sceneGraphics.children.add(imageView)
 
   stage = new PrimaryStage() {

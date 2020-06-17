@@ -4,11 +4,8 @@ import Balistic_Crashers.enemies.Enemies
 import scalafx.scene.shape.Shape
 
 trait AI {
-  def moveEnemyAxisUp(enemy:(Shape,Enemies)):Unit
-  def moveEnemyAxisDown(enemy:(Shape,Enemies)):Unit
-  def moveEnemyAxisLeft(enemy:(Shape,Enemies)):Unit
-  def moveEnemyAxisRight(enemy:(Shape,Enemies)):Unit
+  def doEnemyMovement(enemy:(Shape,Enemies),deltaTime:Double):Unit
   var enemyName:String
-  var time:Double
+  var enemyMovementInterval:Double
   var typeName:String
 }

@@ -10,21 +10,20 @@ class Lapix(x: Double, y: Double) extends Ship {
   val image: Image = new Image(inputStream)
   val lapixShipImage: ImageView = new ImageView(image)
 
-  def Lapix() {
+  def Lapix(){
     lapixShipImage.setX(x)
     lapixShipImage.setY(y)
     lapixShipImage.setFitHeight(175)
     lapixShipImage.setFitWidth(175)
     lapixShipImage.setPreserveRatio(true)
   }
-
-  Lapix() //call co
+  Lapix()
 
   override val stationaryAttackBonus: Double = 15.50
 
-  var spd: Double = 60.00
+  var spd: Double = 85.00
 
-  var atk: Double = 10.0
+  var atk: Double = 12.0
 
   override def getShip(): ImageView = {
     lapixShipImage
