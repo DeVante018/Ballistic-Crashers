@@ -118,9 +118,11 @@ class Game {
         if ((deltaDistanceY >= -40 && deltaDistanceY <= 1) && (deltaDistanceX <= 60 && deltaDistanceX > 0)) {
           playerAttackLasersMap -= laser._1 // laser remove
           sceneGraphics.children.remove(laser._1)
-          enemyShip._2.health -= player_1.ship.atk
-          println("player hit")
-          if (enemyShip._2.health <= 0) {
+          val okayToGetHit:Double = enemyShip._2.loc.locx - enemyShip._2.stopAnimationXpos
+          if(enemyShip._2.animationDone || okayToGetHit <= 200.00 ){
+            enemyShip._2.health -= player_1.ship.atk
+          }
+          if(enemyShip._2.health <= 0) {
             sceneGraphics.children.remove(enemyShip._1)
             enemiesMap -= enemyShip._1
             enemyShip._2.animationDone = true
@@ -169,6 +171,9 @@ class Game {
     script += new Script(3,new UpDown("sputter",3.0))
     script += new Script(3,new UpDown("sputter",2.0))
     script += new Script(3,new UpDown("sputter",3.3))
+    script += new Script(1,new UpDown("sputter",1.0))
+    script += new Script(7,new UpDown("sputter",4.0))
+    script += new Script(17,new UpDown("sputter",2.3))
   }
   private var scriptPos:Int = 0
   private var nextEvent:Boolean = true
