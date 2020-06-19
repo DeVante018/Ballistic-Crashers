@@ -8,4 +8,5 @@ trait AI {
   var enemyName:String
   var enemyMovementInterval:Double
   var typeName:String
+  var scaleFactor:Double = 0.1
 }

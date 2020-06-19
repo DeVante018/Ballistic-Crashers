@@ -43,13 +43,13 @@ class Game {
     }
     //enemies attack timer
     for(enemies <- enemiesMap){
-      enemies._2.updateLaserThreshold += deltaTime
+      enemies._2.laserUpdateTimeAccumulator += deltaTime
     }
     for(enemies <- enemiesMap){
       if(enemies._2.animationDone) {
-        if (enemies._2.updateLaserThreshold > enemies._2.LaserUpdateAlpha) {
+        if (enemies._2.laserUpdateTimeAccumulator > enemies._2.laserUpdateAlpha) {
           createNewEnemyLazer(enemies._2)
-          enemies._2.updateLaserThreshold = 0
+          enemies._2.laserUpdateTimeAccumulator = 0
         }
       }
     }
@@ -173,7 +173,7 @@ class Game {
     script += new Script(3,new UpDown("sputter",3.3))
     script += new Script(1,new UpDown("sputter",1.0))
     script += new Script(7,new UpDown("sputter",4.0))
-    script += new Script(17,new UpDown("sputter",2.3))
+    script += new Script(15,new UpDown("sputter",2.3))
 
   }
   private var scriptPos:Int = 0

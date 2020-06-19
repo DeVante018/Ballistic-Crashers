@@ -4,14 +4,14 @@ import Balistic_Crashers.model.Coordinates.Location
 /** Each enemy will have these traits and the update timer for all enemies will be tracked within the enemy itself
  * This will allow for more individual behavior by each enemy ship */
 trait Enemies {
-  var timer: Double = 0.0
-  val loc: Location
-  var speed: Double
-  var health: Double
-  var atk: Double
-  var laserSpeed:Double
-  var updateLaserThreshold:Double = 0.0
-  var LaserUpdateAlpha:Double
-  var animationDone:Boolean = false
-  var stopAnimationXpos:Double
+  var timer: Double = 0.0 //timer for enemy movement
+  val loc: Location // location for each enemy
+  var speed: Double // movement speed
+  var health: Double// health amount
+  var atk: Double // damage value
+  var laserSpeed:Double// speed laser travels
+  var laserUpdateTimeAccumulator:Double = 0.0 // time accumulator ** this will be compared to laserUpdateAlpha **
+  var laserUpdateAlpha:Double // interval between when lasers fire
+  var animationDone:Boolean = false // spawn in animation is finished
+  var stopAnimationXpos:Double // location when the spawn in animation should stop
 }

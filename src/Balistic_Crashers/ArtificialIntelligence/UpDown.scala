@@ -16,8 +16,8 @@ class UpDown(enemy:String,dt:Double) extends AI{
         enemy._2.loc.locy = 5
       }
       else {
-        enemy._1.translateY.value -= 1.0
-        enemy._2.loc.locy -= 1.0
+        enemy._1.translateY.value -= enemy._2.speed * scaleFactor
+        enemy._2.loc.locy -= enemy._2.speed * scaleFactor
       }
     }
     else if(deltaTime > dt && deltaTime < (2*dt)){
@@ -26,8 +26,8 @@ class UpDown(enemy:String,dt:Double) extends AI{
         enemy._2.loc.locy = 745
       }
       else {
-        enemy._1.translateY.value += 1.0
-        enemy._2.loc.locy += 1.0
+        enemy._1.translateY.value += enemy._2.speed * scaleFactor
+        enemy._2.loc.locy += enemy._2.speed * scaleFactor
       }
     }
     else enemy._2.timer = 0.0
