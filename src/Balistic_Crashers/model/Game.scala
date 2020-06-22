@@ -20,9 +20,9 @@ class Game {
   var enemiesMap: mutable.Map[Shape, Enemies] = mutable.Map()
   var world: levelTrait = generateLevel("Nexus")
   val player_1: Player = new Player(200.0, 300.0, "Lapix")
+  var playerHealthBar: Shape = healthBar(0.0)
 
   createScript()
-
   def generateLevel(world: String): levelTrait = world.toLowerCase match {
     case "nexus" => new Nexus
     case "kinetica" => null
@@ -30,7 +30,7 @@ class Game {
   }
 
   val sceneGraphics: Group = new Group {}
-
+  sceneGraphics.children.add(playerHealthBar)
   def update(deltaTime: Double): Unit = {
     //increase the total update time for the player
     player_1.lazerUpdateTimeThreashold += deltaTime
@@ -134,10 +134,12 @@ class Game {
   }
 
   def checkPlayerHit(): Unit = {
-    for (laser <- enemiesAttackLazersMap) {
+    var enemyDamageAmount:Double = 0.0
+    for (laser <- enemiesAttackLazersMap){
       val deltaDistanceX: Double = laser._1.getTranslateX - player_1.ship.getShip().getX //give some leverage on whats a hit
       val deltaDistanceY: Double = laser._1.getTranslateY - player_1.ship.getShip().getY //give some leverage on whats a hit
-      if ((deltaDistanceX <= 135 && deltaDistanceX >= 0) && (deltaDistanceY <= 45 && deltaDistanceY >= 3)) {
+      if ((deltaDistanceX <= 135 && deltaDistanceX >= 0) && (deltaDistanceY <= 88 && deltaDistanceY >= 31)){
+        enemyDamageAmount += laser._2.atk
         enemiesAttackLazersMap -= laser._1
         sceneGraphics.children.remove(laser._1)
         player_1.health -= laser._2.atk
@@ -145,6 +147,14 @@ class Game {
           println("player is dead")
         }
       }
+    }
+    if(enemyDamageAmount > 0.0){
+      sceneGraphics.children.remove(playerHealthBar)
+      playerHealthBar = healthBar(enemyDamageAmount)
+      sceneGraphics.children.add(playerHealthBar)
+    }
+    if(player_1.health < 30.0){
+      playerHealthBar.fill = Color.Red
     }
   }
 
@@ -168,8 +178,6 @@ class Game {
 
   //this method is how to create a script for the game. If interested check out the read-me file to learn how to make it yourself
   def createScript():Unit = {
-    script += new Script(3,new UpDown("sputter",3.0))
-    script += new Script(3,new UpDown("sputter",2.0))
     script += new Script(3,new UpDown("sputter",3.3))
     script += new Script(1,new UpDown("sputter",1.0))
     script += new Script(7,new UpDown("sputter",4.0))
@@ -236,4 +244,18 @@ class Game {
     }
   }
 
+  def healthBar(amount:Double): Shape =  {
+    var healthBarWidth:Double = (2 * player_1.health) - (2 * amount)
+    if(healthBarWidth <= 5.0 && player_1.health > 0.0){
+      healthBarWidth = 5.0
+    }
+    new Rectangle {
+      println(player_1.health)
+      width = healthBarWidth
+      height = 5
+      translateX = 89
+      translateY = 735
+      fill = Color.Green
+    }
+  }
 }

@@ -117,8 +117,8 @@ class Player(locX: Double, locY: Double, shipName: String) {
 
   def movingDown(): Unit = {
     //set boundaries
-    if (playerLocation.locy + (ship.spd * scaleFactor) >= 705) {
-      playerLocation.locy = 705
+    if (playerLocation.locy + (ship.spd * scaleFactor) >= 680) {
+      playerLocation.locy = 680
       ship.getShip().setY(playerLocation.locy)
     }
     else {

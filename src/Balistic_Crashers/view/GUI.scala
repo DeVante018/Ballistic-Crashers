@@ -19,9 +19,10 @@ import scalafx.scene.{Group, Scene}
 
 object GUI extends JFXApp {
 
+  val game: Game = new Game()
   val sceneGraphics: Group = new Group {}
 
-  val titleBalistic: Text = new Text(275.00, 200.00, "Balistic") {
+  val titleBalistic: Text = new Text(415.00, 200.00, "Balistic") {
     style = "-fx-font-size: 48pt"
     fill = new LinearGradient(
       endX = 0,
@@ -34,7 +35,7 @@ object GUI extends JFXApp {
     }
   }
 
-  val titleCrashers: Text = new Text(500.00, 200.00, "Crashers") {
+  val titleCrashers: Text = new Text(650.00, 200.00, "Crashers") {
     style = "-fx-font-size: 48pt"
     fill = new LinearGradient(
       endX = 0,
@@ -50,7 +51,7 @@ object GUI extends JFXApp {
   val inputStream: FileInputStream = new FileInputStream("/Users/DeVante/Desktop/SummerGameProject/src/Balistic_Crashers/assets/UI/Start_Button_Trans.png")
   val image: Image = new Image(inputStream)
   val startButtonOverlay: ImageView = new ImageView(image)
-  startButtonOverlay.setX(427)
+  startButtonOverlay.setX(580)
   startButtonOverlay.setY(240)
   startButtonOverlay.setPreserveRatio(true)
   startButtonOverlay.setOnMouseClicked((event: input.MouseEvent) => startGame())
@@ -59,22 +60,46 @@ object GUI extends JFXApp {
   sceneGraphics.children.add(titleCrashers)
   sceneGraphics.children.add(startButtonOverlay)
 
-  stage = new PrimaryStage() {
+  val parentStage: PrimaryStage = new PrimaryStage() {
     title = "Balistic Crashers"
     scene = new Scene(1341, 750) {
       fill = Black
       content = List(sceneGraphics)
     }
   }
+  stage = parentStage
 
-  // start of the game menu
+  def menu():Unit = {
+    sceneGraphics.children.remove(titleBalistic)
+    sceneGraphics.children.remove(titleCrashers)
+    sceneGraphics.children.remove(startButtonOverlay)
+
+    val Arcade: Text = new Text(600.5, 375.0, "Arcade") {
+      style = "-fx-font-size: 19pt"
+      fill = new LinearGradient(
+        endX = 0,
+        stops = Stops(LightGray,White)
+      )
+    }
+
+    val timedEvent: Text = new Text(560.5, 415.0, "Timed Event") {
+      style = "-fx-font-size: 19pt"
+      fill = DarkGrey
+    }
+
+    sceneGraphics.children.add(Arcade)
+    sceneGraphics.children.add(timedEvent)
+  }
+
+  // start of the game
   def startGame(): Unit = {
-
     var lastUpdateTime: Long = System.nanoTime()
-    val game: Game = new Game()
+    val textForHealth = healthText()
+    game.sceneGraphics.children.add(textForHealth)
     game.sceneGraphics.children.add(game.player_1.ship.getShip())
 
-    stage = new PrimaryStage(){
+
+    val childStage: PrimaryStage = new PrimaryStage(){
       title = "Nexus"
       scene = new Scene(1341, 750){
         fill = Black
@@ -88,6 +113,15 @@ object GUI extends JFXApp {
         game.runScript(dt)
       }
       AnimationTimer(update).start()
+    }
+    stage = childStage
+  }
+
+
+  def healthText(): Text =  {
+    new Text(20, 740, "Health:") {
+      style = "-fx-font-size: 15pt"
+      fill = LightBlue
     }
   }
 }
