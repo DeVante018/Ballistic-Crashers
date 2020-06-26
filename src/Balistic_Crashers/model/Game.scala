@@ -6,6 +6,7 @@ import Balistic_Crashers.enemies.{Enemies, Sputter}
 import Balistic_Crashers.gameplay.Script
 import Balistic_Crashers.model.World.Nexus
 import Balistic_Crashers.model.World.`trait`.levelTrait
+import javafx.scene.image.ImageView
 import scalafx.scene.Group
 import scalafx.scene.paint.Color
 import scalafx.scene.shape.{Rectangle, Shape}
@@ -17,7 +18,7 @@ class Game {
   var playerAttackLasersMap: mutable.Map[Shape, Attacks] = mutable.Map() // maps all lasers shot by the player
   var enemiesAttackLazersMap: mutable.Map[Shape, Enemies] = mutable.Map() // maps all lasers shot by the enemies
   var script:ArrayBuffer[Script] = new ArrayBuffer[Script]()
-  var enemiesMap: mutable.Map[Shape, Enemies] = mutable.Map()
+  var enemiesMap: mutable.Map[ImageView, Enemies] = mutable.Map()
   var world: levelTrait = generateLevel("Nexus")
   val player_1: Player = new Player(200.0, 300.0, "Lapix")
   var playerHealthBar: Shape = healthBar(0.0)
@@ -159,20 +160,13 @@ class Game {
   }
 
   def generateEnemy(x:Double,y:Double,enemyType:String,intelType:AI): Enemies = {
-    val create = new Rectangle {
-      width = 60
-      height = 40
-      translateX = 0.0
-      translateY = 0.0
-      fill = Color.Purple
-    }
-    create.translateX = x
-    create.translateY = y
-    val newEnemy = new Sputter(x,y,intelType.typeName)
+    var newEnemy = new Sputter(x,y,intelType.typeName)
+
     if(enemyType.toLowerCase() == "sputter"){
-      enemiesMap += (create -> newEnemy)
+      newEnemy = new Sputter(x,y,intelType.typeName)
+      enemiesMap += (newEnemy.enemyShipImage -> newEnemy)
     }
-    sceneGraphics.children.add(create)
+    sceneGraphics.children.add(newEnemy.enemyShipImage)
     newEnemy
   }
 
@@ -228,14 +222,14 @@ class Game {
     }
   }
 
-  def shipEntryAnimation(tuple: (Shape, Enemies)): Unit = {
+  def shipEntryAnimation(tuple: (ImageView, Enemies)): Unit = {
     if(tuple._2.loc.locx - enemyShipZoomIn <= tuple._2.stopAnimationXpos){
       tuple._2.loc.locx = tuple._2.stopAnimationXpos
-      tuple._1.translateX.value = tuple._2.stopAnimationXpos
+      tuple._1.setX(tuple._2.stopAnimationXpos)
     }
     else {
       tuple._2.loc.locx -= enemyShipZoomIn
-      tuple._1.translateX.value -= enemyShipZoomIn
+      tuple._1.setX(tuple._2.loc.locx)
       enemyShipZoomIn -= 0.04
     }
     if(tuple._2.loc.locx == tuple._2.stopAnimationXpos){

@@ -1,10 +1,10 @@
 package Balistic_Crashers.ArtificialIntelligence
 
 import Balistic_Crashers.enemies.Enemies
-import scalafx.scene.shape.Shape
+import javafx.scene.image.ImageView
 
 trait AI {
-  def doEnemyMovement(enemy:(Shape,Enemies),deltaTime:Double):Unit
+  def doEnemyMovement(enemy:(ImageView,Enemies),deltaTime:Double):Unit
   var enemyName:String
   var enemyMovementInterval:Double
   var typeName:String

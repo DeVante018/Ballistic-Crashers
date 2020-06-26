@@ -14,4 +14,5 @@ trait Enemies {
   var laserUpdateAlpha:Double // interval between when lasers fire
   var animationDone:Boolean = false // spawn in animation is finished
   var stopAnimationXpos:Double // location when the spawn in animation should stop
+  def initializeShip():Unit
 }
