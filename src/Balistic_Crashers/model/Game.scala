@@ -6,6 +6,7 @@ import Balistic_Crashers.enemies.{Enemies, Sputter}
 import Balistic_Crashers.gameplay.Script
 import Balistic_Crashers.model.World.Nexus
 import Balistic_Crashers.model.World.`trait`.levelTrait
+import Balistic_Crashers.model.consumables.{Consumable, Health, LaserBuff, Score}
 import javafx.scene.image.ImageView
 import scalafx.scene.Group
 import scalafx.scene.paint.Color
@@ -17,12 +18,13 @@ class Game {
 
   var playerAttackLasersMap: mutable.Map[Shape, Attacks] = mutable.Map() // maps all lasers shot by the player
   var enemiesAttackLazersMap: mutable.Map[Shape, Enemies] = mutable.Map() // maps all lasers shot by the enemies
+  var consumableArray: mutable.ArrayBuffer[Consumable] = mutable.ArrayBuffer()
   var script:ArrayBuffer[Script] = new ArrayBuffer[Script]()
   var enemiesMap: mutable.Map[ImageView, Enemies] = mutable.Map()
   var world: levelTrait = generateLevel("Nexus")
   val player_1: Player = new Player(200.0, 300.0, "Lapix")
   var playerHealthBar: Shape = healthBar(0.0)
-
+  initializeConsumablesArray()
   createScript()
   def generateLevel(world: String): levelTrait = world.toLowerCase match {
     case "nexus" => new Nexus
@@ -32,6 +34,7 @@ class Game {
 
   val sceneGraphics: Group = new Group {}
   sceneGraphics.children.add(playerHealthBar)
+
   def update(deltaTime: Double): Unit = {
     //increase the total update time for the player
     player_1.lazerUpdateTimeThreashold += deltaTime
@@ -77,8 +80,8 @@ class Game {
     val newLazerShape = new Rectangle {
       width = 12
       height = 3
-      translateX = enemy.loc.locx
-      translateY = enemy.loc.locy
+      translateX = enemy.loc.locx - 17
+      translateY = enemy.loc.locy + 60
       fill = Color.Green
     }
     enemiesAttackLazersMap += (newLazerShape -> enemy)
@@ -94,7 +97,7 @@ class Game {
       else {
         theLazer._1.translateX = theLazer._1.translateX.toDouble + (140 * .1)
       }
-      println(playerAttackLasersMap.size)
+      //println(playerAttackLasersMap.size)
     }
   }
 
@@ -107,28 +110,14 @@ class Game {
       else {
         theLazer._1.translateX = theLazer._1.translateX.value - (theLazer._2.laserSpeed * .1)
       }
-      //println(playerAttackLasersMap.size)
     }
   }
 
   def checkEnemyHit(): Unit = {
     for (laser <- playerAttackLasersMap) {
       for (enemyShip <- enemiesMap) {
-        val deltaDistanceX: Double = laser._1.getTranslateX - enemyShip._1.getTranslateX //give some leverage on whats a hit
-        val deltaDistanceY: Double = enemyShip._1.getTranslateY - laser._1.getTranslateY //give some leverage on whats a hit
-        if ((deltaDistanceY >= -40 && deltaDistanceY <= 1) && (deltaDistanceX <= 60 && deltaDistanceX > 0)) {
-          playerAttackLasersMap -= laser._1 // laser remove
-          sceneGraphics.children.remove(laser._1)
-          val okayToGetHit:Double = enemyShip._2.loc.locx - enemyShip._2.stopAnimationXpos
-          if(enemyShip._2.animationDone || okayToGetHit <= 200.00 ){
-            enemyShip._2.health -= player_1.ship.atk
-          }
-          if(enemyShip._2.health <= 0) {
-            sceneGraphics.children.remove(enemyShip._1)
-            enemiesMap -= enemyShip._1
-            enemyShip._2.animationDone = true
-            enemyShipZoomIn = 10.00
-          }
+        if(enemyShip._2.name == "sputter"){
+          sputterHitBox(enemyShip,laser)
         }
       }
     }
@@ -157,6 +146,7 @@ class Game {
     if(player_1.health < 30.0){
       playerHealthBar.fill = Color.Red
     }
+    else{ playerHealthBar.fill = Color.Green}
   }
 
   def generateEnemy(x:Double,y:Double,enemyType:String,intelType:AI): Enemies = {
@@ -172,12 +162,13 @@ class Game {
 
   //this method is how to create a script for the game. If interested check out the read-me file to learn how to make it yourself
   def createScript():Unit = {
-    script += new Script(3,new UpDown("sputter",3.3))
-    script += new Script(1,new UpDown("sputter",1.0))
-    script += new Script(7,new UpDown("sputter",4.0))
-    script += new Script(15,new UpDown("sputter",2.3))
-
+    script += new Script(15,new UpDown("sputter",3.0))
+    script += new Script(5,new UpDown("sputter",2.0))
+    script += new Script(3,new UpDown("sputter",1.0))
+    script += new Script(15,new UpDown("sputter",3.0))
   }
+
+
   private var scriptPos:Int = 0
   private var nextEvent:Boolean = true
   private var spawnDelay:Double = 0.0
@@ -231,6 +222,7 @@ class Game {
       tuple._2.loc.locx -= enemyShipZoomIn
       tuple._1.setX(tuple._2.loc.locx)
       enemyShipZoomIn -= 0.04
+      println(tuple._1.getX)
     }
     if(tuple._2.loc.locx == tuple._2.stopAnimationXpos){
       tuple._2.animationDone = true
@@ -244,12 +236,60 @@ class Game {
       healthBarWidth = 5.0
     }
     new Rectangle {
-      println(player_1.health)
       width = healthBarWidth
       height = 5
       translateX = 89
       translateY = 735
       fill = Color.Green
+    }
+  }
+
+  def sputterHitBox(enemyData:(ImageView,Enemies),laser:(Shape,Attacks)):Unit = {
+    val deltaDistanceX: Double = laser._1.getTranslateX - enemyData._1.getX //give some leverage on whats a hit
+    val deltaDistanceY: Double = enemyData._1.getY - laser._1.getTranslateY //give some leverage on whats a hit
+    if ((deltaDistanceY >= -40 && deltaDistanceY <= -10) && (deltaDistanceX >= 40 && deltaDistanceX < 114)) { //hit box for top orb of UFO
+      playerAttackLasersMap -= laser._1 // laser remove
+      println(deltaDistanceX)
+      sceneGraphics.children.remove(laser._1)
+      val okayToGetHit:Double = enemyData._2.loc.locx - enemyData._2.stopAnimationXpos
+      if(enemyData._2.animationDone || okayToGetHit <= 200.00 ){
+        enemyData._2.health -= player_1.ship.atk
+      }
+      if(enemyData._2.health <= 0) {
+        sceneGraphics.children.remove(enemyData._1)
+        enemiesMap -= enemyData._1
+        enemyData._2.animationDone = true
+        enemyShipZoomIn = 10.00
+      }
+    }
+    else if((deltaDistanceY >= -90 && deltaDistanceY <= -40) && (deltaDistanceX >= 0 && deltaDistanceX < 166)) { //hit box for top orb of UFO
+      playerAttackLasersMap -= laser._1 // laser remove
+      println(deltaDistanceX)
+      sceneGraphics.children.remove(laser._1)
+      val okayToGetHit:Double = enemyData._2.loc.locx - enemyData._2.stopAnimationXpos
+      if(enemyData._2.animationDone || okayToGetHit <= 200.00 ){
+        enemyData._2.health -= player_1.ship.atk
+      }
+      if(enemyData._2.health <= 0) {
+        sceneGraphics.children.remove(enemyData._1)
+        enemiesMap -= enemyData._1
+        enemyData._2.animationDone = true
+        enemyShipZoomIn = 10.00
+      }
+    }
+  }
+
+  def initializeConsumablesArray(): Unit =  {
+    val h = new Health
+    val l = new LaserBuff
+    val s = new Score
+
+    for (x <- 0 until 5) { //25% chance receiving health or laser buff
+      consumableArray += h
+      consumableArray += l
+    }
+    for ( x <- 0 until 10){ // 50% chance of receiving
+      consumableArray += s
     }
   }
 }

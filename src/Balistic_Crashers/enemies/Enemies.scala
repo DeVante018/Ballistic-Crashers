@@ -1,9 +1,10 @@
 package Balistic_Crashers.enemies
 
-import Balistic_Crashers.model.Coordinates.Location
+import Balistic_Crashers.model.coordinates.Location
 /** Each enemy will have these traits and the update timer for all enemies will be tracked within the enemy itself
  * This will allow for more individual behavior by each enemy ship */
 trait Enemies {
+  val name:String
   var timer: Double = 0.0 //timer for enemy movement
   val loc: Location // location for each enemy
   var speed: Double // movement speed
