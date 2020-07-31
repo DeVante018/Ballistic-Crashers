@@ -1,10 +1,11 @@
 package Balistic_Crashers.model.consumables
 
 import Balistic_Crashers.Player
+import Balistic_Crashers.model.coordinates.Location
 
-class Health extends Consumable {
+class Health(loc:Location) extends Consumable {
 
-  override def use(player:Player): Unit = {
+  def use(player:Player): Unit = {
     if(player.health < 100 && player.health > 0){
       player.health += 15
       if(player.health > 100){
@@ -12,4 +13,5 @@ class Health extends Consumable {
       }
     }
   }
+
 }

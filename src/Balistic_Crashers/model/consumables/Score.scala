@@ -1,7 +1,6 @@
 package Balistic_Crashers.model.consumables
-import Balistic_Crashers.Player
+import Balistic_Crashers.model.coordinates.Location
 
-class Score extends Consumable {
-  override def use(player: Player): Unit = {
-  }
+class Score(loc:Location) extends Consumable {
+
 }

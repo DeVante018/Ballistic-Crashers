@@ -22,7 +22,7 @@ object GUI extends JFXApp {
   val game: Game = new Game()
   val sceneGraphics: Group = new Group {}
 
-  val titleBalistic: Text = new Text(415.00, 200.00, "Balistic") {
+  val titleBalistic: Text = new Text(415.00, 200.00, "Ballistic") {
     style = "-fx-font-size: 48pt"
     fill = new LinearGradient(
       endX = 0,
@@ -35,7 +35,7 @@ object GUI extends JFXApp {
     }
   }
 
-  val titleCrashers: Text = new Text(650.00, 200.00, "Crashers") {
+  val titleCrashers: Text = new Text(660.00, 200.00, "Crashers") {
     style = "-fx-font-size: 48pt"
     fill = new LinearGradient(
       endX = 0,
@@ -104,7 +104,7 @@ object GUI extends JFXApp {
       scene = new Scene(1341, 750){
         fill = Black
         content = List(game.sceneGraphics)
-        addEventHandler(KeyEvent.ANY, new WASDInputs(game.player_1))
+        addEventHandler(KeyEvent.ANY, new WASDInputs(game.player_1)) // controller for player
       }
       val update: Long => Unit = (time: Long) => {
         val dt: Double = (time - lastUpdateTime) / 1000000000.0

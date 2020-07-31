@@ -7,6 +7,7 @@ import Balistic_Crashers.gameplay.Script
 import Balistic_Crashers.model.World.Nexus
 import Balistic_Crashers.model.World.`trait`.levelTrait
 import Balistic_Crashers.model.consumables.{Consumable, Health, LaserBuff, Score}
+import Balistic_Crashers.model.coordinates.Location
 import javafx.scene.image.ImageView
 import scalafx.scene.Group
 import scalafx.scene.paint.Color
@@ -36,7 +37,6 @@ class Game {
   sceneGraphics.children.add(playerHealthBar)
 
   def update(deltaTime: Double): Unit = {
-    //increase the total update time for the player
     player_1.lazerUpdateTimeThreashold += deltaTime
     val lazerCheck: Boolean = player_1.update(deltaTime)//checks if player is holding down the space button (shoot laser button)
     if (lazerCheck){
@@ -47,7 +47,7 @@ class Game {
     }
     //enemies attack timer
     for(enemies <- enemiesMap){
-      enemies._2.laserUpdateTimeAccumulator += deltaTime
+      enemies._2.laserUpdateTimeAccumulator += deltaTime // interval between when enemies fire
     }
     for(enemies <- enemiesMap){
       if(enemies._2.animationDone) {
@@ -280,16 +280,21 @@ class Game {
   }
 
   def initializeConsumablesArray(): Unit =  {
-    val h = new Health
-    val l = new LaserBuff
-    val s = new Score
+    val h = new Health(new Location(1500,300))
+    val l = new LaserBuff(new Location(1500,300))
+    val s = new Score(new Location(1500,300))
 
-    for (x <- 0 until 5) { //25% chance receiving health or laser buff
+    for (x <- 1 until 5) { //25% chance receiving health or laser buff
       consumableArray += h
       consumableArray += l
     }
-    for ( x <- 0 until 10){ // 50% chance of receiving
+    for ( x <- 1 until 10){ // 50% chance of receiving score buff
       consumableArray += s
     }
+  }
+
+  def generateConsumable():Unit = {
+    val randomNumber = util.Random
+    val buff = consumableArray(randomNumber.nextInt(19))
   }
 }
