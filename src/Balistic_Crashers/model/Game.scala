@@ -1,13 +1,13 @@
 package Balistic_Crashers.model
 
-import Balistic_Crashers.ArtificialIntelligence.{AI, UpDown}
 import Balistic_Crashers.Player
+import Balistic_Crashers.artificialIntelligence.{AI, UpDown}
 import Balistic_Crashers.enemies.{Enemies, Sputter}
 import Balistic_Crashers.gameplay.Script
-import Balistic_Crashers.model.World.Nexus
-import Balistic_Crashers.model.World.`trait`.levelTrait
-import Balistic_Crashers.model.consumables.{Consumable, Health, LaserBuff, Score}
+import Balistic_Crashers.model.consumables.{Consumable, Health}
 import Balistic_Crashers.model.coordinates.Location
+import Balistic_Crashers.model.world.Nexus
+import Balistic_Crashers.model.world.`trait`.levelTrait
 import javafx.scene.image.ImageView
 import scalafx.scene.Group
 import scalafx.scene.paint.Color
@@ -19,12 +19,18 @@ class Game {
 
   var playerAttackLasersMap: mutable.Map[Shape, Attacks] = mutable.Map() // maps all lasers shot by the player
   var enemiesAttackLazersMap: mutable.Map[Shape, Enemies] = mutable.Map() // maps all lasers shot by the enemies
-  var consumableArray: mutable.ArrayBuffer[Consumable] = mutable.ArrayBuffer()
-  var script:ArrayBuffer[Script] = new ArrayBuffer[Script]()
   var enemiesMap: mutable.Map[ImageView, Enemies] = mutable.Map()
-  var world: levelTrait = generateLevel("Nexus")
+  var consumableArray: mutable.ArrayBuffer[String] = mutable.ArrayBuffer()
+  var script:ArrayBuffer[Script] = new ArrayBuffer[Script]()
+
   val player_1: Player = new Player(200.0, 300.0, "Lapix")
+  var world: levelTrait = generateLevel("Nexus")
   var playerHealthBar: Shape = healthBar(0.0)
+  var generateConsumableTimer: Double = 0.0
+  var currentConsumable: Consumable = new Health(new Location(0,0))//needs a temporary place holder item
+  val sceneGraphics: Group = new Group {}
+  sceneGraphics.children.add(playerHealthBar)
+
   initializeConsumablesArray()
   createScript()
   def generateLevel(world: String): levelTrait = world.toLowerCase match {
@@ -33,11 +39,12 @@ class Game {
     case _ => null
   }
 
-  val sceneGraphics: Group = new Group {}
-  sceneGraphics.children.add(playerHealthBar)
 
   def update(deltaTime: Double): Unit = {
     player_1.lazerUpdateTimeThreashold += deltaTime
+    generateConsumableTimer += deltaTime
+
+    /** player attack laser interval */
     val lazerCheck: Boolean = player_1.update(deltaTime)//checks if player is holding down the space button (shoot laser button)
     if (lazerCheck){
       if (player_1.lazerUpdateTimeThreashold > 0.3) { //if the set amount of time has passed then allow laser to fire
@@ -45,7 +52,8 @@ class Game {
         player_1.lazerUpdateTimeThreashold = 0.0
       }
     }
-    //enemies attack timer
+
+    /** enemy attack timer intervals */
     for(enemies <- enemiesMap){
       enemies._2.laserUpdateTimeAccumulator += deltaTime // interval between when enemies fire
     }
@@ -57,6 +65,26 @@ class Game {
         }
       }
     }
+
+    /** consumable generation method */
+    if(currentConsumable.notOnScreen){//defaults for boolean is true
+      if(generateConsumableTimer > 10.0){
+        generateConsumable()
+        generateConsumableTimer = 0.0
+        currentConsumable.notOnScreen = false
+      }
+    }
+    else{
+      generateConsumableTimer = 0.0
+      currentConsumable.moveImage()
+      if(currentConsumable.itemImage.getX < -17.0){
+        currentConsumable.notOnScreen = true
+        currentConsumable.itemImage.setX(1500.00)
+        sceneGraphics.children.remove(currentConsumable)
+      }
+    }
+
+    /** update game methods */
     updateEnemyLaserPosition(enemiesAttackLazersMap)
     updatePlayerLaserPosition(playerAttackLasersMap)
     checkEnemyHit()
@@ -162,7 +190,7 @@ class Game {
 
   //this method is how to create a script for the game. If interested check out the read-me file to learn how to make it yourself
   def createScript():Unit = {
-    script += new Script(15,new UpDown("sputter",3.0))
+    script += new Script(7,new UpDown("sputter",3.0))
     script += new Script(5,new UpDown("sputter",2.0))
     script += new Script(3,new UpDown("sputter",1.0))
     script += new Script(15,new UpDown("sputter",3.0))
@@ -222,7 +250,7 @@ class Game {
       tuple._2.loc.locx -= enemyShipZoomIn
       tuple._1.setX(tuple._2.loc.locx)
       enemyShipZoomIn -= 0.04
-      println(tuple._1.getX)
+
     }
     if(tuple._2.loc.locx == tuple._2.stopAnimationXpos){
       tuple._2.animationDone = true
@@ -249,7 +277,6 @@ class Game {
     val deltaDistanceY: Double = enemyData._1.getY - laser._1.getTranslateY //give some leverage on whats a hit
     if ((deltaDistanceY >= -40 && deltaDistanceY <= -10) && (deltaDistanceX >= 40 && deltaDistanceX < 114)) { //hit box for top orb of UFO
       playerAttackLasersMap -= laser._1 // laser remove
-      println(deltaDistanceX)
       sceneGraphics.children.remove(laser._1)
       val okayToGetHit:Double = enemyData._2.loc.locx - enemyData._2.stopAnimationXpos
       if(enemyData._2.animationDone || okayToGetHit <= 200.00 ){
@@ -264,7 +291,6 @@ class Game {
     }
     else if((deltaDistanceY >= -90 && deltaDistanceY <= -40) && (deltaDistanceX >= 0 && deltaDistanceX < 166)) { //hit box for top orb of UFO
       playerAttackLasersMap -= laser._1 // laser remove
-      println(deltaDistanceX)
       sceneGraphics.children.remove(laser._1)
       val okayToGetHit:Double = enemyData._2.loc.locx - enemyData._2.stopAnimationXpos
       if(enemyData._2.animationDone || okayToGetHit <= 200.00 ){
@@ -280,21 +306,32 @@ class Game {
   }
 
   def initializeConsumablesArray(): Unit =  {
-    val h = new Health(new Location(1500,300))
-    val l = new LaserBuff(new Location(1500,300))
-    val s = new Score(new Location(1500,300))
-
+    val randomNumber = util.Random
     for (x <- 1 until 5) { //25% chance receiving health or laser buff
-      consumableArray += h
-      consumableArray += l
+      consumableArray += "health"
+      consumableArray += "laser"
     }
     for ( x <- 1 until 10){ // 50% chance of receiving score buff
-      consumableArray += s
+      consumableArray += "score"
     }
   }
 
-  def generateConsumable():Unit = {
+  def generateConsumable(): Unit = {
     val randomNumber = util.Random
-    val buff = consumableArray(randomNumber.nextInt(19))
+    val consumableName = consumableArray(randomNumber.nextInt(19))
+    if(consumableName == "health"){
+      currentConsumable = new Health(new Location(1500,randomNumber.nextInt(700)))
+    }
+    else if(consumableName == "laser"){
+      currentConsumable = new Health(new Location(1500,randomNumber.nextInt(700)))
+    }
+    else{
+      currentConsumable = new Health(new Location(1500,randomNumber.nextInt(700)))
+    }
+    sceneGraphics.children.add(currentConsumable.itemImage)
+  }
+
+  def detectCollisionConsumable():Boolean = {
+    false
   }
 }

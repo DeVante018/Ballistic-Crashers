@@ -1,8 +1,8 @@
-package Balistic_Crashers.model.Ships
+package Balistic_Crashers.model.ships
 
 import java.io.FileInputStream
 
-import Balistic_Crashers.model.Ships.Trait.Ship
+import Balistic_Crashers.model.ships.Trait.Ship
 import javafx.scene.image.{Image, ImageView}
 
 class StarScream(x: Double, y: Double) extends Ship {

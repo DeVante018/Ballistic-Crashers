@@ -1,8 +1,8 @@
 package Balistic_Crashers
 
-import Balistic_Crashers.model.Ships.Trait.Ship
-import Balistic_Crashers.model.Ships.{Drogon, Lapix, StarScream, Vultra}
 import Balistic_Crashers.model.coordinates.Location
+import Balistic_Crashers.model.ships.Trait.Ship
+import Balistic_Crashers.model.ships.{Drogon, Lapix, StarScream, Vultra}
 import Balistic_Crashers.statepatterns.PlayerState
 import Balistic_Crashers.statepatterns.playstates.Still
 import scalafx.scene.paint.Color

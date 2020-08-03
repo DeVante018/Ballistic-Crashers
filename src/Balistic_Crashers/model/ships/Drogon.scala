@@ -1,11 +1,11 @@
-package Balistic_Crashers.model.Ships
+package Balistic_Crashers.model.ships
 
 import java.io.FileInputStream
 
-import Balistic_Crashers.model.Ships.Trait.Ship
+import Balistic_Crashers.model.ships.Trait.Ship
 import javafx.scene.image.{Image, ImageView}
 
-class Vultra(x: Double, y: Double) extends Ship {
+class Drogon(x: Double, Y: Double) extends Ship {
 
   val inputStream: FileInputStream = new FileInputStream("/Users/DeVante/Desktop/SummerGameProject/src/Balistic_Crashers/Assets/Ships/Ship #1_TEST.png")
   val image: Image = new Image(inputStream)
@@ -33,6 +33,7 @@ class Vultra(x: Double, y: Double) extends Ship {
 
   override def secret(): Unit = {}
 
-  override def getShip(): ImageView = lapixShipImage
-
+  override def getShip(): ImageView = {
+    lapixShipImage
+  }
 }

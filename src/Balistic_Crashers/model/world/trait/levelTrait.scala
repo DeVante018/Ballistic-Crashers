@@ -1,4 +1,4 @@
-package Balistic_Crashers.model.World.`trait`
+package Balistic_Crashers.model.world.`trait`
 
 trait levelTrait {
 

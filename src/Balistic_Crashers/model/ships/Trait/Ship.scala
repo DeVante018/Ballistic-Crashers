@@ -1,4 +1,4 @@
-package Balistic_Crashers.model.Ships.Trait
+package Balistic_Crashers.model.ships.Trait
 
 import javafx.scene.image.ImageView
 

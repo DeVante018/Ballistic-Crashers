@@ -1,4 +1,4 @@
-package Balistic_Crashers.ArtificialIntelligence
+package Balistic_Crashers.artificialIntelligence
 
 import Balistic_Crashers.enemies.Enemies
 import javafx.scene.image.ImageView

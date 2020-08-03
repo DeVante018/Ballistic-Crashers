@@ -1,6 +1,14 @@
 package Balistic_Crashers.model.consumables
 
+import javafx.scene.image.ImageView
+
 
 trait Consumable {
-  // just to create commonality between class types
+  val itemImage:ImageView
+  val timer:Double
+  var notInUse:Boolean = true
+  var notOnScreen:Boolean = true
+  val name:String
+
+  def moveImage():Unit
 }
