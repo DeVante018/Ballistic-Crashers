@@ -1,12 +1,13 @@
 package Balistic_Crashers.view
 
-import java.io.FileInputStream
+import java.io.{File, FileInputStream}
 
 import Balistic_Crashers.controller.WASDInputs
 import Balistic_Crashers.model.Game
 import javafx.scene.image.{Image, ImageView}
 import javafx.scene.input
 import javafx.scene.input.KeyEvent
+import javafx.scene.media.{Media, MediaPlayer}
 import scalafx.animation.AnimationTimer
 import scalafx.application.JFXApp
 import scalafx.application.JFXApp.PrimaryStage
@@ -60,6 +61,7 @@ object GUI extends JFXApp {
   sceneGraphics.children.add(titleCrashers)
   sceneGraphics.children.add(startButtonOverlay)
 
+
   val parentStage: PrimaryStage = new PrimaryStage() {
     title = "Balistic Crashers"
     scene = new Scene(1341, 750) {
@@ -90,15 +92,15 @@ object GUI extends JFXApp {
     sceneGraphics.children.add(Arcade)
     sceneGraphics.children.add(timedEvent)
   }
+  val path: String = "/Users/DeVante/Desktop/SummerGameProject/src/Balistic_Crashers/assets/sounds/Healing_D_Vison.mp3"
+  val media: Media = new Media(new File(path).toURI.toString)
+  val mediaPlayer: MediaPlayer = new MediaPlayer(media)
+  //mediaPlayer.play()  // for some fucking reason the sound wont play. Something about the jdk version bla bla bla
+
 
   // start of the game
   def startGame(): Unit = {
     var lastUpdateTime: Long = System.nanoTime()
-    val textForHealth = healthText()
-    game.sceneGraphics.children.add(textForHealth)
-    game.sceneGraphics.children.add(game.player_1.ship.getShip())
-
-
     val childStage: PrimaryStage = new PrimaryStage(){
       title = "Nexus"
       scene = new Scene(1341, 750){
@@ -115,13 +117,5 @@ object GUI extends JFXApp {
       AnimationTimer(update).start()
     }
     stage = childStage
-  }
-
-
-  def healthText(): Text =  {
-    new Text(20, 740, "Health:") {
-      style = "-fx-font-size: 15pt"
-      fill = LightBlue
-    }
   }
 }

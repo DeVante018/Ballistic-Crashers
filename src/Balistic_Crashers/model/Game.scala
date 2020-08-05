@@ -1,21 +1,27 @@
 package Balistic_Crashers.model
 
+import java.io.FileInputStream
+
 import Balistic_Crashers.Player
 import Balistic_Crashers.artificialIntelligence.{AI, UpDown}
 import Balistic_Crashers.enemies.{Enemies, Sputter}
 import Balistic_Crashers.gameplay.Script
-import Balistic_Crashers.model.consumables.{Consumable, Health}
+import Balistic_Crashers.model.consumables.{Consumable, Health, LaserBuff}
 import Balistic_Crashers.model.coordinates.Location
 import Balistic_Crashers.model.world.Nexus
 import Balistic_Crashers.model.world.`trait`.levelTrait
-import javafx.scene.image.ImageView
+import javafx.geometry.Rectangle2D
+import javafx.scene.image.{Image, ImageView}
 import scalafx.scene.Group
 import scalafx.scene.paint.Color
+import scalafx.scene.paint.Color.LightBlue
 import scalafx.scene.shape.{Rectangle, Shape}
+import scalafx.scene.text.Text
 
 import scala.collection.mutable
 import scala.collection.mutable.ArrayBuffer
 class Game {
+
 
   var playerAttackLasersMap: mutable.Map[Shape, Attacks] = mutable.Map() // maps all lasers shot by the player
   var enemiesAttackLazersMap: mutable.Map[Shape, Enemies] = mutable.Map() // maps all lasers shot by the enemies
@@ -26,10 +32,17 @@ class Game {
   val player_1: Player = new Player(200.0, 300.0, "Lapix")
   var world: levelTrait = generateLevel("Nexus")
   var playerHealthBar: Shape = healthBar(0.0)
+  val textForHealth: Text = healthText()
+  val background: ImageView = generateBackground()
   var generateConsumableTimer: Double = 0.0
   var currentConsumable: Consumable = new Health(new Location(0,0))//needs a temporary place holder item
   val sceneGraphics: Group = new Group {}
+
+  sceneGraphics.children.add(background)
+  sceneGraphics.children.add(textForHealth)
   sceneGraphics.children.add(playerHealthBar)
+  sceneGraphics.children.add(player_1.ship.getShip())
+
 
   initializeConsumablesArray()
   createScript()
@@ -87,6 +100,7 @@ class Game {
     /** update game methods */
     updateEnemyLaserPosition(enemiesAttackLazersMap)
     updatePlayerLaserPosition(playerAttackLasersMap)
+    scrollScreen()
     checkEnemyHit()
     checkPlayerHit()
   }
@@ -258,6 +272,13 @@ class Game {
     }
   }
 
+  def healthText(): Text =  {
+    new Text(20, 740, "Health:") {
+      style = "-fx-font-size: 15pt"
+      fill = LightBlue
+    }
+  }
+
   def healthBar(amount:Double): Shape =  {
     var healthBarWidth:Double = (2 * player_1.health) - (2 * amount)
     if(healthBarWidth <= 5.0 && player_1.health > 0.0){
@@ -272,6 +293,14 @@ class Game {
     }
   }
 
+  def generateBackground():ImageView = {
+    val inputStreamBack: FileInputStream = new FileInputStream("/Users/DeVante/Desktop/SummerGameProject/src/Balistic_Crashers/assets/scenery/Background.png")
+    val imageBack: Image = new Image(inputStreamBack)
+    val back: ImageView = new ImageView(imageBack)
+    val viewport: Rectangle2D = new Rectangle2D(0,0,1400,775)
+    back.setViewport(viewport)
+    back
+  }
   def sputterHitBox(enemyData:(ImageView,Enemies),laser:(Shape,Attacks)):Unit = {
     val deltaDistanceX: Double = laser._1.getTranslateX - enemyData._1.getX //give some leverage on whats a hit
     val deltaDistanceY: Double = enemyData._1.getY - laser._1.getTranslateY //give some leverage on whats a hit
@@ -307,28 +336,35 @@ class Game {
 
   def initializeConsumablesArray(): Unit =  {
     val randomNumber = util.Random
-    for (x <- 1 until 5) { //25% chance receiving health or laser buff
+    for (x <- 1 to 5) { //25% chance receiving health or laser buff
       consumableArray += "health"
       consumableArray += "laser"
     }
-    for ( x <- 1 until 10){ // 50% chance of receiving score buff
-      consumableArray += "score"
+    for ( x <- 1 to 10){ // 50% chance of receiving score buff
+      //consumableArray += "score"
     }
   }
 
   def generateConsumable(): Unit = {
     val randomNumber = util.Random
-    val consumableName = consumableArray(randomNumber.nextInt(19))
+    val consumableName = consumableArray(randomNumber.nextInt(9))
     if(consumableName == "health"){
       currentConsumable = new Health(new Location(1500,randomNumber.nextInt(700)))
     }
     else if(consumableName == "laser"){
-      currentConsumable = new Health(new Location(1500,randomNumber.nextInt(700)))
+      currentConsumable = new LaserBuff(new Location(1500,randomNumber.nextInt(700)))
     }
     else{
       currentConsumable = new Health(new Location(1500,randomNumber.nextInt(700)))
     }
     sceneGraphics.children.add(currentConsumable.itemImage)
+  }
+
+  def scrollScreen():Unit = {
+    val view = background.getViewport
+    val xVal = view.getMinX
+    val viewport: Rectangle2D = new Rectangle2D(xVal + 1.5,0,1400,775)
+    background.setViewport(viewport)
   }
 
   def detectCollisionConsumable():Boolean = {
