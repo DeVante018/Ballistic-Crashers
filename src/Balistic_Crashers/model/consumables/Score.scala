@@ -9,11 +9,13 @@ class Score(loc:Location) extends Consumable {
   private val image: Image = new Image(inputStream)
   override val itemImage: ImageView = new ImageView(image)
 
-  override val timer: Double = 0.0
+  override var timer: Double = 0.0
   override val name: String = "laser"
 
   override def moveImage(): Unit = {
     loc.locx = loc.locx-12.75
     itemImage.setX(loc.locx)
   }
+
+  override val timerAlpha: Double = 0.0
 }

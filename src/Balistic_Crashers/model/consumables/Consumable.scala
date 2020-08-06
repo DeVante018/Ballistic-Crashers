@@ -5,7 +5,8 @@ import javafx.scene.image.ImageView
 
 trait Consumable {
   val itemImage:ImageView
-  val timer:Double
+  var timer:Double
+  val timerAlpha:Double
   var notInUse:Boolean = true
   var notOnScreen:Boolean = true
   val name:String

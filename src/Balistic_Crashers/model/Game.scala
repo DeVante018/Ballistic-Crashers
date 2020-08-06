@@ -37,6 +37,7 @@ class Game {
   var generateConsumableTimer: Double = 0.0
   var currentConsumable: Consumable = new Health(new Location(0,0))//needs a temporary place holder item
   val sceneGraphics: Group = new Group {}
+  var itemDelay:Boolean = false
 
   sceneGraphics.children.add(background)
   sceneGraphics.children.add(textForHealth)
@@ -81,20 +82,37 @@ class Game {
 
     /** consumable generation method */
     if(currentConsumable.notOnScreen){//defaults for boolean is true
-      if(generateConsumableTimer > 10.0){
-        generateConsumable()
-        generateConsumableTimer = 0.0
-        currentConsumable.notOnScreen = false
+      if(!itemDelay){
+        if (generateConsumableTimer > 10.0) {
+          generateConsumable()
+          generateConsumableTimer = 0.0
+          currentConsumable.notOnScreen = false
+        }
+      }
+      else{
+        currentConsumable.timer += deltaTime
+        if(currentConsumable.timer > currentConsumable.timerAlpha){
+          itemDelay = false
+          currentConsumable.timer = 0
+        }
       }
     }
     else{
       generateConsumableTimer = 0.0
       currentConsumable.moveImage()
-      if(currentConsumable.itemImage.getX < -17.0){
+      if(detectCollisionConsumable()){
+        sceneGraphics.children.remove(currentConsumable.itemImage)
+        currentConsumable.notOnScreen = true
+        if(currentConsumable.name == "laser"){
+          itemDelay = true
+        }
+      }
+      if(currentConsumable.itemImage.getX < -25.0){
         currentConsumable.notOnScreen = true
         currentConsumable.itemImage.setX(1500.00)
-        sceneGraphics.children.remove(currentConsumable)
+        sceneGraphics.children.remove(currentConsumable.itemImage)
       }
+      detectCollisionConsumable()
     }
 
     /** update game methods */
@@ -362,8 +380,11 @@ class Game {
 
   def scrollScreen():Unit = {
     val view = background.getViewport
-    val xVal = view.getMinX
-    val viewport: Rectangle2D = new Rectangle2D(xVal + 1.5,0,1400,775)
+    var xVal = view.getMinX
+    if(xVal >= 2732){
+      xVal = 0
+    }
+    val viewport: Rectangle2D = new Rectangle2D(xVal + 1.0,0,1400,775)
     background.setViewport(viewport)
   }
 
