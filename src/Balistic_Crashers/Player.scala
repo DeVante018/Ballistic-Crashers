@@ -18,8 +18,10 @@ class Player(locX: Double, locY: Double, shipName: String) {
   var health: Double = 100
   //speed scale factor
   val scaleFactor: Double = 0.1
-  //time for player to update
-  var lazerUpdateTimeThreashold:Double = 0.0
+  //amount if time that has passed until
+  var laserUpdateCounter:Double = 0.0
+  //laserUpdateCounter should at least be grater than laserUpdateAlpha to fire again
+  var laserUpdateAlpha: Double = 0.3
   // set different states for the player
   var stateOfPlayer: PlayerState = new Still(this)
   var count: Int = 0

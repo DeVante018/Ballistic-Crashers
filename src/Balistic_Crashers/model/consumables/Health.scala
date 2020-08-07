@@ -11,6 +11,7 @@ class Health(loc:Location) extends Consumable {
   private val inputStream: FileInputStream = new FileInputStream("/Users/DeVante/Desktop/SummerGameProject/src/Balistic_Crashers/assets/items/HealthPack.png")
   private val image: Image = new Image(inputStream)
   override val itemImage: ImageView = new ImageView(image)
+  override val timerAlpha: Double = 0.0
   override var timer: Double = 0.0
   override val name: String = "health"
 
@@ -37,5 +38,4 @@ class Health(loc:Location) extends Consumable {
   }
 
   initializeLocation()
-  override val timerAlpha: Double = 0.0
 }

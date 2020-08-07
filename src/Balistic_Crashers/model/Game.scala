@@ -39,6 +39,11 @@ class Game {
   val sceneGraphics: Group = new Group {}
   var itemDelay:Boolean = false
 
+  //consumable buff booleans
+  var laserBuff: Boolean = false
+  var healthBuff: Boolean = false
+  var scoreBuff: Boolean = false
+
   sceneGraphics.children.add(background)
   sceneGraphics.children.add(textForHealth)
   sceneGraphics.children.add(playerHealthBar)
@@ -55,15 +60,15 @@ class Game {
 
 
   def update(deltaTime: Double): Unit = {
-    player_1.lazerUpdateTimeThreashold += deltaTime
+    player_1.laserUpdateCounter += deltaTime
     generateConsumableTimer += deltaTime
 
     /** player attack laser interval */
     val lazerCheck: Boolean = player_1.update(deltaTime)//checks if player is holding down the space button (shoot laser button)
     if (lazerCheck){
-      if (player_1.lazerUpdateTimeThreashold > 0.3) { //if the set amount of time has passed then allow laser to fire
+      if (player_1.laserUpdateCounter > player_1.laserUpdateAlpha) { //if the set amount of time has passed then allow laser to fire
         createNewPlayerLazer()
-        player_1.lazerUpdateTimeThreashold = 0.0
+        player_1.laserUpdateCounter = 0.0
       }
     }
 
@@ -90,10 +95,20 @@ class Game {
         }
       }
       else{
+        generateConsumableTimer = 0.0
         currentConsumable.timer += deltaTime
         if(currentConsumable.timer > currentConsumable.timerAlpha){
           itemDelay = false
           currentConsumable.timer = 0
+          if(laserBuff){
+            laserBuff = false
+            player_1.laserUpdateAlpha = 0.3 // original value
+          }
+          if(scoreBuff){
+            //do something
+            scoreBuff = false
+          }
+          println("time expired")
         }
       }
     }
@@ -104,7 +119,23 @@ class Game {
         sceneGraphics.children.remove(currentConsumable.itemImage)
         currentConsumable.notOnScreen = true
         if(currentConsumable.name == "laser"){
+          laserBuff = true
           itemDelay = true
+          player_1.laserUpdateAlpha = 0.1 // laser buff
+        }
+        else if(currentConsumable.name == "score"){
+          scoreBuff = true
+          itemDelay = false
+        }
+        else{
+          sceneGraphics.children.remove(playerHealthBar)
+          playerHealthBar = healthBar(-20) // go to healthBar function logic to see why value is negative.
+          player_1.health += 20                    // It ends up increasing the health by 20%
+          if(player_1.health > 100){
+            player_1.health = 100
+          }
+          sceneGraphics.children.add(playerHealthBar)
+          itemDelay = false
         }
       }
       if(currentConsumable.itemImage.getX < -25.0){
@@ -112,7 +143,6 @@ class Game {
         currentConsumable.itemImage.setX(1500.00)
         sceneGraphics.children.remove(currentConsumable.itemImage)
       }
-      detectCollisionConsumable()
     }
 
     /** update game methods */
@@ -130,6 +160,9 @@ class Game {
       translateX = player_1.playerLocation.locx + 170
       translateY = player_1.playerLocation.locy + 83
       fill = Color.Red
+    }
+    if(laserBuff){
+      newLazerShape.fill = Color.DarkBlue
     }
     val newLazerAttributes = new Attacks(player_1)
     playerAttackLasersMap += (newLazerShape -> newLazerAttributes)
@@ -299,8 +332,11 @@ class Game {
 
   def healthBar(amount:Double): Shape =  {
     var healthBarWidth:Double = (2 * player_1.health) - (2 * amount)
-    if(healthBarWidth <= 5.0 && player_1.health > 0.0){
+    if(healthBarWidth <= 2.0 && player_1.health > 0.0){
       healthBarWidth = 5.0
+    }
+    if(healthBarWidth > 200){
+      healthBarWidth = 200
     }
     new Rectangle {
       width = healthBarWidth
@@ -389,6 +425,16 @@ class Game {
   }
 
   def detectCollisionConsumable():Boolean = {
+    val consumeLocX:Double = currentConsumable.itemImage.getX
+    val consumeLocY:Double = currentConsumable.itemImage.getY
+    val xDistance = consumeLocX - player_1.playerLocation.locx
+    val yDistance = consumeLocY - player_1.playerLocation.locy
+
+    if(xDistance <= 175 && xDistance >= -1){
+      if(yDistance <= 100 && yDistance >= 0){
+        return true
+      }
+    }
     false
   }
 }
