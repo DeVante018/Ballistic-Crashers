@@ -58,7 +58,7 @@ class Game {
     case _ => null
   }
 
-
+  // Method that updates all aspects of game
   def update(deltaTime: Double): Unit = {
     player_1.laserUpdateCounter += deltaTime
     generateConsumableTimer += deltaTime
@@ -255,9 +255,9 @@ class Game {
 
   //this method is how to create a script for the game. If interested check out the read-me file to learn how to make it yourself
   def createScript():Unit = {
-    script += new Script(7,new UpDown("sputter",3.0))
-    script += new Script(5,new UpDown("sputter",2.0))
-    script += new Script(3,new UpDown("sputter",1.0))
+    script += new Script(3,new UpDown("sputter",3.0))
+    script += new Script(4,new UpDown("sputter",2.0))
+    script += new Script(2,new UpDown("sputter",1.0))
     script += new Script(15,new UpDown("sputter",3.0))
   }
 
